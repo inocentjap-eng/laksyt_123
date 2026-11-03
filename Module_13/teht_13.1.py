@@ -1,34 +1,44 @@
-from flask import Flask
-import math
+from flask import Flask, Response
+import json
 
 app = Flask(__name__)
-app.json.sort_keys = False   # keep keys in the order I write them
 
-
-def is_prime(n):
-    """Return True if n is a prime number."""
-    if n < 2:
+def onko_alkuluku(luku):
+    # replace with your own prime function from the earlier exercise
+    if luku < 2:
         return False
-    for i in range(2, math.isqrt(n) + 1):
-        if n % i == 0:
+    for jakaja in range(2, int(luku ** 0.5) + 1):
+        if luku % jakaja == 0:
             return False
     return True
 
-
-@app.route("/alkuluku/<luku>")
+@app.route('/alkuluku/<luku>')
 def alkuluku(luku):
     try:
-        n = int(luku)
+        luku = int(luku)
+        tilakoodi = 200
+        vastaus = {
+            "Number": luku,
+            "isPrime": onko_alkuluku(luku)
+        }
     except ValueError:
-        return {"status": 400, "teksti": "Parametrin on oltava kokonaisluku"}, 400
+        tilakoodi = 400
+        vastaus = {
+            "status": tilakoodi,
+            "teksti": "Virheellinen luku"
+        }
 
-    return {"Number": n, "isPrime": is_prime(n)}
-
+    jsonvast = json.dumps(vastaus)
+    return Response(response=jsonvast, status=tilakoodi, mimetype="application/json")
 
 @app.errorhandler(404)
-def page_not_found(error):
-    return {"status": 404, "teksti": "Virheellinen päätepiste"}, 404
+def page_not_found(virhekoodi):
+    vastaus = {
+        "status": 404,
+        "teksti": "Virheellinen päätepiste"
+    }
+    jsonvast = json.dumps(vastaus)
+    return Response(response=jsonvast, status=404, mimetype="application/json")
 
-
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=3000, debug=True)
+if __name__ == '__main__':
+    app.run(use_reloader=True, host='127.0.0.1', port=3000)
