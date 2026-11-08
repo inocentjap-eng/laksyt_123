@@ -4,7 +4,6 @@ import json
 app = Flask(__name__)
 
 def onko_alkuluku(luku):
-    # replace with your own prime function from the earlier exercise
     if luku < 2:
         return False
     for jakaja in range(2, int(luku ** 0.5) + 1):
